@@ -1,0 +1,105 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="container">
+        <div id="timer">
+            <div id="countdown">
+                <span id="minutes">00</span>
+                <span>:</span>
+                <span id="seconds">00</span>
+            </div>
+            <div id="buttons">
+                <button id="startStop">Start</button>
+                <button id="pause">Pause</button>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    var minutes = document.getElementById('minutes'),
+        seconds = document.getElementById('seconds'),
+        settings = document.getElementById('settings'),
+        startStop = document.getElementById('startStop'),
+        pause = document.getElementById('pause'),
+        isPaused = false,
+        progress = null,
+        totalTime = 0;
+
+    function pauseProgress () {
+        if (startStop.innerHTML == "Start") return;
+        if (!isPaused) {
+            isPaused = true;
+            clearInterval(progress);
+        } else {
+            isPaused = false;
+            progress = setInterval(trackProgress, 1000);
+        }
+    }
+        
+    function trackProgress () {
+        totalTime--;
+        
+        secondsRemaining = Math.floor(totalTime % 60);
+        minutesRemaining = Math.floor(totalTime / 60);
+        
+        (secondsRemaining < 10) ? seconds.innerHTML = `0${secondsRemaining.toString()}` : seconds.innerHTML = secondsRemaining.toString();
+        (minutesRemaining < 10) ? minutes.innerHTML = `0${minutesRemaining.toString()}` : minutes.innerHTML = minutesRemaining.toString();
+        
+        if (minutesRemaining == 0 && secondsRemaining == 0) {
+            clearInterval(progress);
+            startStop.innerHTML = "Start";
+            progress = null;
+        }
+    }
+        
+    function startProgress () {
+        if (parseInt(minutes.innerHTML) == 0 && parseInt(seconds.innerHTML) == 0) return;
+        if (startStop.innerHTML == "Stop") {
+            startStop.innerHTML = "Start"
+            minutes.innerHTML = '00';
+            seconds.innerHTML = '00';
+            clearInterval(progress);
+        } else {
+            startStop.innerHTML = "Stop"
+        };
+        if (!progress) {
+            progress = setInterval(trackProgress, 1000);
+            totalTime = parseInt(minutes.innerHTML) * 60 + parseInt(seconds.innerHTML);
+        } else {
+            clearInterval(progress);
+            progress = null;
+        }
+    }
+        
+    function textSelect () {
+        var range, selection;
+        
+        minutes.contentEditable = true;
+        seconds.contentEditable = true;
+        
+        if (window.getSelection && document.createRange) {
+            selection = window.getSelection();
+            range = document.createRange();
+            range.selectNodeContents(this);
+            selection.removeAllRanges();
+            selection.addRange(range);
+        } else if (document.selection && document.body.createTextRange) {
+            range = document.body.createTextRange();
+            range.moveToElementText(this);
+            range.select();
+        }
+    }
+        
+    pause.addEventListener('click', pauseProgress);
+    startStop.addEventListener('click', startProgress);
+    minutes.addEventListener('click', textSelect);
+    seconds.addEventListener('click', textSelect);
+    seconds.addEventListener('focusin', textSelect);
+    seconds.addEventListener('focusout', () => {window.getSelection().removeAllRanges()});
+</script>
+</html>
