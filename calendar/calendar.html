@@ -1,0 +1,81 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="container">
+        <div id="calendar">
+            <div id="month">
+                <button id="previous">&#x2190;</button>
+                <p id="monthYear"></p>
+                <button id="next">&#x2192;</button>
+            </div>
+            <div id="dates">
+                <span class="weekday">Monday</span>
+                <span class="weekday">Tuesday</span>
+                <span class="weekday">Wednesday</span>
+                <span class="weekday">Thursday</span>
+                <span class="weekday">Friday</span>
+                <span class="weekday">Saturday</span>
+                <span class="weekday">Sunday</span>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+
+    const today = new Date();
+    var month = [];
+    var monthMod = 0;
+    var focusMonth = today.getMonth() + monthMod;
+    var dates = document.getElementById('dates');
+
+    for (var i = 0; i < 42; i++) {
+        dates.appendChild(Object.assign(document.createElement('div'))).classList.add('date');
+    }
+
+    function findMonth() {
+        for (var i = 0; i < 42; i++) {
+            const newDate = new Date(today.getFullYear(), focusMonth, 1);
+            const firstWeekday = newDate.getDay();
+            if (i < firstWeekday) {
+            const dateToAdd = newDate.setDate(newDate.getDate() - i - 1);
+            month.unshift(new Date(dateToAdd));
+            } else {
+            const dateToAdd = newDate.setDate(newDate.getDate() + i - firstWeekday);
+            month.push(new Date(dateToAdd));
+            }
+        }
+        //populate
+        const dateContainer = document.getElementsByClassName('date');
+          for (var i = 0; i < dateContainer.length; i++){
+              dateContainer[i].innerHTML = "";
+              dateContainer[i].appendChild(document.createTextNode(month[i].getDate()));
+          }
+        //set month name
+        document.getElementById('monthYear').innerHTML = month[15].toLocaleString('default', { month: 'long', year: 'numeric'});
+    }
+
+    const previous = document.getElementById('previous');
+    const next = document.getElementById('next');
+    
+    previous.addEventListener('click', () => {
+        monthMod--;
+        month = [];
+        focusMonth = today.getMonth() + monthMod;
+        findMonth();
+    });
+
+    next.addEventListener('click', () => {
+        monthMod++;
+        month = [];
+        focusMonth = today.getMonth() + monthMod;
+        findMonth();
+    });
+
+    findMonth();
+</script>
+</html>
